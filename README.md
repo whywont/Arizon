@@ -1,1 +1,1 @@
-# Arizon
+# Arizona
