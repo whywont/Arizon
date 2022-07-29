@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import openpyxl
-
+import numpy as np
 
 def get_files():
     drive_path = 'C:\\Users\\Andrew\\Documents\\Arizona'
@@ -9,15 +9,21 @@ def get_files():
     pl2 = []
     #Walk through dir and get the paths of all the csv files. Append to list
     for root, dirs, files in os.walk(drive_path):
+            count = 0 
             # print(os.listdir(dirs)[0])
             for name in files:
                 if name.startswith("00") and (name.endswith('.XLSX') | name.endswith('.XLS')):
-                    #HOW to get first occurence
-                    temp_list = []
-                    path_list.append(os.path.join(root, name))
-            # pl2.append([name for name in files if name.startswith("00") and (name.endswith('.XLSX') | name.endswith('.XLS'))][0])
+                    #The first file in directory contains the information we want
+                    count+=1
+                    #Only save path if count = 1
+                    if count == 1:
+                        path_list.append(os.path.join(root, name))
+                    else:
+                        continue
+            
 
-    # print(path_list)
+    print(path_list)
+    print(len(path_list))
     # print(pl2)
     return path_list
 
@@ -25,7 +31,8 @@ def get_files():
 def controller():
 
     files = get_files()
-    df = clean_oofr(files)
+    # df = clean_oofr(files)
+    cheat_sheet(files)
 
 
 
@@ -38,7 +45,8 @@ def clean_oofr(files):
         #Make sure file can be opened.
         try:
             temp = pd.read_excel(file)
-        except:
+        except Exception as e:
+            print(e)
             continue
         if 'F/A' in temp.columns:
             table['FA count'] = temp['F/A'].count()
@@ -63,6 +71,23 @@ def clean_oofr(files):
     df.fillna("No Information Available", inplace=True)
 
     df.to_csv('oofr_stats.csv', index=False)
+
+def cheat_sheet(files):
+    table = {}
+    for file in files:
+        table = {}
+        #Make sure file can be opened.
+        try:
+            temp = pd.read_excel(file,sheet_name=1)
+            
+        except Exception as e:
+            print(e)
+        # print(temp)
+        temp = temp.astype(str)
+        mask = np.column_stack([temp[col].str.contains(r"\Builder", na=False, case=False) for col in temp])
+        
+        col = temp.iloc[mask.any(axis=1)]
+        # print(col)
 
 controller() 
 
