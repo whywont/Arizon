@@ -3,14 +3,14 @@ import pandas as pd
 import openpyxl
 import numpy as np
 
-def get_files():
+def get_files(path):
     drive_path = 'C:\\Users\\Andrew\\Documents\\Arizona'
     path_list = []
-    pl2 = []
+    print(path)
     #Walk through dir and get the paths of all the csv files. Append to list
-    for root, dirs, files in os.walk(drive_path):
-            count = 0 
+    for root, dirs, files in os.walk(path):
             # print(os.listdir(dirs)[0])
+            count = 0 
             for name in files:
                 if name.startswith("00") and (name.endswith('.XLSX') | name.endswith('.XLS')):
                     #The first file in directory contains the information we want
@@ -21,16 +21,12 @@ def get_files():
                     else:
                         continue
             
-
-    print(path_list)
-    print(len(path_list))
-    # print(pl2)
     return path_list
 
 #Main function that will call all other functions. Takes path from app.py (GUI)
-def controller():
-
-    files = get_files()
+def controller(path):
+    print(path)
+    files = get_files(path)
     # df = clean_oofr(files)
     cheat_sheet(files)
 
@@ -103,6 +99,6 @@ def cheat_sheet(files):
         print(matrix)           
             
 
-controller() 
+ 
 
 
