@@ -73,7 +73,7 @@ def clean_oofr(files):
     df.to_csv('oofr_stats.csv', index=False)
 
 def cheat_sheet(files):
-    table = {}
+    matrix = []
     for file in files:
         table = {}
         #Make sure file can be opened.
@@ -84,10 +84,24 @@ def cheat_sheet(files):
             print(e)
         # print(temp)
         temp = temp.astype(str)
-        mask = np.column_stack([temp[col].str.contains(r"\Builder", na=False, case=False) for col in temp])
         
-        col = temp.iloc[mask.any(axis=1)]
-        # print(col)
+        col = temp.loc[temp.isin(['Builder:']).any(axis=1)].index.tolist()
+
+        #Data is disorganized, have to find the tables within the sheet and append
+        #based on key-word (builder, Homes, clients)
+        for ind,column in enumerate(temp.columns):
+            for r,row in enumerate(temp[column]):
+                if 'Builder' in str(row):
+                    table['Builder'] = temp.iloc[r, ind+1]
+                if 'of Homes' in str(row):
+                    print(row)
+                    table['Number of Homes'] = temp.iloc[r, ind+1]
+                if 'Clients' in str(row):
+                    table['Total Clients'] = temp.iloc[r, ind+1]
+        #Append temp dict to master list
+        matrix.append(table)            
+        print(matrix)           
+            
 
 controller() 
 
